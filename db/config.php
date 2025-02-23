@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost'; // or your database host
-$dbname = 'enterprise_system--1';
+$dbname = 'enterprise_system-l';
 $username = 'root';
 $password = '';
 
