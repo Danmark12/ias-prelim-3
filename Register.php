@@ -4,7 +4,7 @@ require_once "./db/config.php";
 
 // Define variables and initialize with empty values
 $username = $password = $confirm_password = $user_type = "";
-$username_err = $password_err = $confirm_password_err = "";
+$username_err = $password_err = $confirm_password_err = $user_type_err = "";
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -112,19 +112,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         body { font: 14px sans-serif; }
         .wrapper { width: 360px; padding: 20px; margin: 0 auto; margin-top: 50px; }
     </style>
-    <script>
-        function toggleForms() {
-            const loginForm = document.getElementById('loginForm');
-            const signupForm = document.getElementById('signupForm');
-            if (loginForm.style.display === 'none') {
-                loginForm.style.display = 'block';
-                signupForm.style.display = 'none';
-            } else {
-                loginForm.style.display = 'none';
-                signupForm.style.display = 'block';
-            }
-        }
-    </script>
 </head>
 <body>
     <div class="container mt-5">

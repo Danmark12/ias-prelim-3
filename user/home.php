@@ -5,7 +5,7 @@ session_start();
 // Include config file
 require_once "../db/config.php";
 
-// Check if the user is logged in, if not then redirect them to login page
+// Check if the user is logged in, if not then redirect them to the login page
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: index.php");
     exit;
@@ -118,12 +118,18 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($userLoginLogs as $log): ?>
-            <tr>
-                <td><?php echo date("Y-m-d H:i:s", strtotime($log['login_time'])); ?></td>
-                <td><?php echo htmlspecialchars($log['ip_address']); ?></td>
-            </tr>
-            <?php endforeach; ?>
+            <?php if(count($userLoginLogs) > 0): ?>
+                <?php foreach ($userLoginLogs as $log): ?>
+                    <tr>
+                        <td><?php echo date("Y-m-d H:i:s", strtotime($log['login_time'])); ?></td>
+                        <td><?php echo htmlspecialchars($log['ip_address']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="2">No login logs available.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 
@@ -138,18 +144,24 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($failedAttempts as $attempt): ?>
-            <tr>
-                <td><?php echo date("Y-m-d H:i:s", strtotime($attempt['attempt_time'])); ?></td>
-                <td><?php echo htmlspecialchars($attempt['ip_address']); ?></td>
-                <td><?php echo htmlspecialchars($attempt['status']); ?></td>
-            </tr>
-            <?php endforeach; ?>
+            <?php if(count($failedAttempts) > 0): ?>
+                <?php foreach ($failedAttempts as $attempt): ?>
+                    <tr>
+                        <td><?php echo date("Y-m-d H:i:s", strtotime($attempt['attempt_time'])); ?></td>
+                        <td><?php echo htmlspecialchars($attempt['ip_address']); ?></td>
+                        <td><?php echo htmlspecialchars($attempt['status']); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <tr>
+                    <td colspan="3">No failed login attempts found.</td>
+                </tr>
+            <?php endif; ?>
         </tbody>
     </table>
 
     <p>
-    <a href="../Logout.php" class="btn btn-danger">Logout</a>
+        <a href="../Logout.php" class="btn btn-danger">Logout</a>
     </p>
 
 </body>

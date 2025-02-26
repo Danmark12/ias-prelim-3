@@ -50,7 +50,7 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -62,6 +62,17 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
         }
         table {
             margin-bottom: 30px;
+        }
+        h3 {
+            color: #007bff;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
         }
     </style>
 </head>
@@ -118,8 +129,9 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
             </tbody>
         </table>
     </div>
+    
     <p>
-    <a href="../Logout.php" class="btn btn-danger">Logout</a>
+        <a href="../Logout.php" class="btn btn-danger">Logout</a>
     </p>
 
     <!-- Bootstrap JS for any needed functionality (optional) -->
