@@ -5,7 +5,7 @@ session_start();
 // Include config file
 require_once "../db/config.php";
 
-// Check if the user is logged in, if not then redirect them to the login page
+// Redirect if not logged in
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: index.php");
     exit;
@@ -146,6 +146,7 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
 <body>
 
     <div class="container">
+        <!-- Welcome message -->
         <h1>Welcome, <b><?php echo htmlspecialchars($_SESSION["username"]); ?></b></h1>
         
         <!-- User Dashboard Card -->

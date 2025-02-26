@@ -1,17 +1,14 @@
 <?php
-// Include config file
-require_once "../db/config.php";
-
-// Initialize the session
 session_start();
+require_once '../db/config.php';
 
-// Check if the user is logged in, if not then redirect them to the login page
+// Check if the user is logged in and is an admin
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["user_type"] !== 'admin') {
-    header("location:./index.php");
+    header("location: index.php");
     exit;
 }
 
-// Admin specific logic: Fetching login logs
+// Fetch login logs and failed login attempts
 function getLoginLogs($pdo) {
     $logs = [];
     $sql = "SELECT u.username, l.login_time FROM login_logs l JOIN users u ON l.user_id = u.id ORDER BY l.login_time DESC LIMIT 10";
@@ -19,12 +16,10 @@ function getLoginLogs($pdo) {
         if ($stmt->execute()) {
             $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        unset($stmt);
     }
     return $logs;
 }
 
-// Fetch failed login attempts by IP address
 function getFailedLoginAttempts($pdo, $ipAddress) {
     $attempts = [];
     $sql = "SELECT * FROM login_attempts WHERE ip_address = :ip_address";
@@ -33,7 +28,6 @@ function getFailedLoginAttempts($pdo, $ipAddress) {
         if ($stmt->execute()) {
             $attempts = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        unset($stmt);
     }
     return $attempts;
 }
@@ -79,6 +73,9 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
 <body>
     <!-- Admin Dashboard Layout -->
     <div class="container">
+        <h3 class="my-3">Welcome, Admin</h3>
+
+        <!-- Recent Login Logs Section -->
         <h3 class="my-3">Recent Login Logs</h3>
         <table class="table table-bordered table-striped">
             <thead>
@@ -103,6 +100,7 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
             </tbody>
         </table>
 
+        <!-- Failed Login Attempts Section -->
         <h3 class="my-3">Failed Login Attempts (IP: <?php echo htmlspecialchars($ipAddress); ?>)</h3>
         <table class="table table-bordered table-striped">
             <thead>
@@ -128,11 +126,12 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
                 <?php endif; ?>
             </tbody>
         </table>
+
+        <!-- Logout Button -->
+        <p>
+            <a href="../Logout.php" class="btn btn-danger">Logout</a>
+        </p>
     </div>
-    
-    <p>
-        <a href="../Logout.php" class="btn btn-danger">Logout</a>
-    </p>
 
     <!-- Bootstrap JS for any needed functionality (optional) -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

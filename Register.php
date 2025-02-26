@@ -1,6 +1,10 @@
 <?php
-// Include config file
-require_once "./db/config.php";
+session_start();
+require_once 'db/config.php';
+require_once 'functions.php';
+
+// CSRF Token generation
+$csrfToken = generateCSRFToken();
 
 // Define variables and initialize with empty values
 $username = $password = $confirm_password = $user_type = "";
@@ -8,6 +12,11 @@ $username_err = $password_err = $confirm_password_err = $user_type_err = "";
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Check CSRF Token
+    if (!verifyCSRFToken($_POST['csrf_token'])) {
+        echo "Invalid CSRF Token!";
+        exit;
+    }
 
     // Validate username
     if (empty(trim($_POST["username"]))) {
@@ -15,28 +24,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', trim($_POST["username"]))) {
         $username_err = "Username can only contain letters, numbers, and underscores.";
     } else {
-        // Prepare a select statement
+        // Prepare a select statement to check if username exists
         $sql = "SELECT id FROM users WHERE username = :username";
-
         if ($stmt = $pdo->prepare($sql)) {
-            // Bind variables to the prepared statement as parameters
             $stmt->bindParam(":username", $param_username, PDO::PARAM_STR);
-
-            // Set parameters
             $param_username = trim($_POST["username"]);
 
-            // Attempt to execute the prepared statement
             if ($stmt->execute()) {
                 if ($stmt->rowCount() == 1) {
                     $username_err = "This username is already taken.";
                 } else {
                     $username = trim($_POST["username"]);
                 }
-            } else {
-                echo "Oops! Something went wrong. Please try again later.";
             }
-
-            // Close statement
             unset($stmt);
         }
     }
@@ -69,35 +69,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check input errors before inserting in database
     if (empty($username_err) && empty($password_err) && empty($confirm_password_err) && empty($user_type_err)) {
+        // Hash password
+        $hashedPassword = hashPassword($password);
 
         // Prepare an insert statement
         $sql = "INSERT INTO users (username, password, user_type) VALUES (:username, :password, :user_type)";
-
         if ($stmt = $pdo->prepare($sql)) {
-            // Bind variables to the prepared statement as parameters
             $stmt->bindParam(":username", $param_username, PDO::PARAM_STR);
             $stmt->bindParam(":password", $param_password, PDO::PARAM_STR);
             $stmt->bindParam(":user_type", $param_user_type, PDO::PARAM_STR);
 
             // Set parameters
             $param_username = $username;
-            $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
+            $param_password = $hashedPassword;
             $param_user_type = $user_type;
 
             // Attempt to execute the prepared statement
             if ($stmt->execute()) {
-                // Redirect to login page
-                header("location: index.php");
+                echo "Registration successful. Please log in.";
+                // Redirect to login page or further action
             } else {
-                echo "Oops! Something went wrong. Please try again later.";
+                echo "Error registering user.";
             }
-
-            // Close statement
             unset($stmt);
         }
     }
-
-    // Close connection
     unset($pdo);
 }
 ?>
@@ -122,6 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h2 class="text-center mb-4">Sign Up</h2>
                     <p>Please fill this form to create an account.</p>
                     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
                         <div class="mb-3">
                             <label for="signupUsername" class="form-label">Username</label>
                             <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" id="signupUsername" placeholder="Enter username" value="<?php echo $username; ?>">
