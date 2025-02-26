@@ -6,7 +6,7 @@ require_once "../db/config.php";
 session_start();
 
 // Check if the user is logged in, if not then redirect them to the login page
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true || $_SESSION["user_type"] !== 'admin') {
     header("location:./index.php");
     exit;
 }
@@ -52,12 +52,24 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        table {
+            margin-bottom: 30px;
+        }
+    </style>
 </head>
 <body>
     <!-- Admin Dashboard Layout -->
     <div class="container">
         <h3 class="my-3">Recent Login Logs</h3>
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th>Username</th>
@@ -65,17 +77,23 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($loginLogs as $log): ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($log['username']); ?></td>
-                    <td><?php echo date("Y-m-d H:i:s", strtotime($log['login_time'])); ?></td>
-                </tr>
-                <?php endforeach; ?>
+                <?php if (count($loginLogs) > 0): ?>
+                    <?php foreach ($loginLogs as $log): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($log['username']); ?></td>
+                        <td><?php echo date("Y-m-d H:i:s", strtotime($log['login_time'])); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="2">No recent login logs found.</td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
 
         <h3 class="my-3">Failed Login Attempts (IP: <?php echo htmlspecialchars($ipAddress); ?>)</h3>
-        <table class="table table-bordered">
+        <table class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th>Attempt Time</th>
@@ -84,15 +102,25 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($failedAttempts as $attempt): ?>
-                <tr>
-                    <td><?php echo date("Y-m-d H:i:s", strtotime($attempt['attempt_time'])); ?></td>
-                    <td><?php echo htmlspecialchars($attempt['ip_address']); ?></td>
-                    <td><?php echo htmlspecialchars($attempt['status']); ?></td>
-                </tr>
-                <?php endforeach; ?>
+                <?php if (count($failedAttempts) > 0): ?>
+                    <?php foreach ($failedAttempts as $attempt): ?>
+                    <tr>
+                        <td><?php echo date("Y-m-d H:i:s", strtotime($attempt['last_failed_attempt'])); ?></td>
+                        <td><?php echo htmlspecialchars($attempt['ip_address']); ?></td>
+                        <td><?php echo htmlspecialchars($attempt['failed_attempts'] > 0 ? 'Blocked' : 'Failed'); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="3">No failed login attempts found.</td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
+
+    <!-- Bootstrap JS for any needed functionality (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
 </body>
 </html>

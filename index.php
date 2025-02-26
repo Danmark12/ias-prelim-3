@@ -5,9 +5,13 @@ require_once "./db/config.php";
 // Initialize the session
 session_start();
 
-// Check if the user is already logged in, if so redirect to dashboard
+// Check if the user is already logged in, if so redirect to the appropriate dashboard
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location: dashboard.php");
+    if ($_SESSION["user_type"] === "admin") {
+        header("location: admin_dashboard.php"); // Redirect to admin dashboard
+    } else {
+        header("location: user_home.php"); // Redirect to user home
+    }
     exit;
 }
 
@@ -46,11 +50,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $user = $stmt->fetch(PDO::FETCH_ASSOC);
                         // Verify the password
                         if (password_verify($password, $user['password'])) {
-                            // Password is correct, start a session and redirect to dashboard
+                            // Password is correct, start a session and redirect based on user type
                             $_SESSION["loggedin"] = true;
                             $_SESSION["username"] = $user["username"];
                             $_SESSION["user_type"] = $user["user_type"];
-                            header("location: dashboard.php");
+                            $_SESSION["id"] = $user["id"]; // Store user ID
+
+                            // Redirect based on user type
+                            if ($_SESSION["user_type"] === "admin") {
+                                header("location: admin/dashboard.php");
+                            } else {
+                                header("location: user/home.php");
+                            }
                             exit;
                         } else {
                             // Incorrect password, log the failed attempt
