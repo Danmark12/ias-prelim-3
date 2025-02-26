@@ -14,7 +14,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 // Fetch login logs for the current user
 function getUserLoginLogs($pdo, $userId) {
     $logs = [];
-    $sql = "SELECT * FROM login_logs WHERE user_id = :user_id";
+    $sql = "SELECT * FROM login_logs WHERE user_id = :user_id ORDER BY login_time DESC";
     if ($stmt = $pdo->prepare($sql)) {
         $stmt->bindParam(":user_id", $userId, PDO::PARAM_INT);
         if ($stmt->execute()) {
