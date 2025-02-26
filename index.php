@@ -8,9 +8,9 @@ session_start();
 // Check if the user is already logged in, if so redirect to the appropriate dashboard
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
     if ($_SESSION["user_type"] === "admin") {
-        header("location: admin_dashboard.php"); // Redirect to admin dashboard
+        header("location: admin/dashboard.php"); // Redirect to admin dashboard
     } else {
-        header("location: user_home.php"); // Redirect to user home
+        header("location: user/home.php"); // Redirect to user home
     }
     exit;
 }

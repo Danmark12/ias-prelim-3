@@ -118,6 +118,9 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
             </tbody>
         </table>
     </div>
+    <p>
+    <a href="../Logout.php" class="btn btn-danger">Logout</a>
+    </p>
 
     <!-- Bootstrap JS for any needed functionality (optional) -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

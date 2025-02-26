@@ -7,7 +7,7 @@ require_once "../db/config.php";
 
 // Check if the user is logged in, if not then redirect them to login page
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    header("location:./index.php");
+    header("location: index.php");
     exit;
 }
 
@@ -149,7 +149,7 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
     </table>
 
     <p>
-        <a href="Logout.php" class="btn btn-danger">Sign Out</a>
+    <a href="../Logout.php" class="btn btn-danger">Logout</a>
     </p>
 
 </body>
