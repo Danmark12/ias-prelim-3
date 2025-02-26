@@ -54,9 +54,59 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
     <meta charset="UTF-8">
     <title>User Page</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #007bff;
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        h3 {
+            color: #343a40;
+            margin-top: 30px;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+
+        th, td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        td {
+            background-color: #f1f1f1;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+        }
+    </style>
 </head>
 <body>
-    <h1 class="my-5">Hi, <b><?php echo htmlspecialchars($_SESSION["username"]); ?></b>. Welcome to your account.</h1>
+
+    <h1>Hi, <b><?php echo htmlspecialchars($_SESSION["username"]); ?></b>. Welcome to your account.</h1>
     
     <!-- User's Login Logs -->
     <h3>Your Recent Login Logs</h3>
@@ -99,7 +149,8 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
     </table>
 
     <p>
-        <a href="Logout.php" class="btn btn-danger ml-3">Sign Out</a>
+        <a href="Logout.php" class="btn btn-danger">Sign Out</a>
     </p>
+
 </body>
 </html>

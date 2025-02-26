@@ -86,17 +86,40 @@ if ($stmt = $pdo->prepare($sql)) {
     <style>
         .flex-container {
             display: flex;
-            flex-direction: wrap;
+            flex-direction: row;
             flex-wrap: wrap;
             justify-content: center;
             margin-top: 15px;
         }
 
-        .flex-container > div {
-            background-color: #f1f1f1;
-            width: 400px;
-            margin-left: 2rem;
+        .flex-container > .card {
+            margin: 10px;
+            width: 300px;
             text-align: center;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        h3 {
+            margin-top: 30px;
+        }
+
+        .navbar {
+            margin-bottom: 30px;
+        }
+
+        .table {
+            margin-top: 20px;
+        }
+
+        button {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -116,8 +139,9 @@ if ($stmt = $pdo->prepare($sql)) {
             </div>
         </div>
     </nav>
-    <h1 style="margin-left:20px">Hi, <b><?php echo htmlspecialchars($_SESSION["username"]); ?></b>. Welcome to the dashboard.</h1>
     
+    <h1 style="margin-left:20px">Hi, <b><?php echo htmlspecialchars($_SESSION["username"]); ?></b>. Welcome to the dashboard.</h1>
+
     <!--Start Dashboard-->
     <div class="flex-container">
         <div class="card text-bg-success mb-3">
@@ -209,7 +233,7 @@ if ($stmt = $pdo->prepare($sql)) {
 
         <button class="btn btn-primary" onclick="printToPDF()">Print to PDF</button>
     </div>
-    <!--End Dashboard-->             
+    <!--End Dashboard-->
 
 <script>
     function printToPDF() {

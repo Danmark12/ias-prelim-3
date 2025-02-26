@@ -1,4 +1,4 @@
-<?php
+<?php 
 // Include config file
 require_once "./db/config.php";
 
@@ -200,6 +200,6 @@ function logFailedAttempt($ip_address) {
         function closeAlert() {
             document.querySelector('.alert-card').style.display = 'none';
         }
-    </script>
+    </script>   
 </body>
 </html>
