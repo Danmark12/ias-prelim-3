@@ -48,12 +48,27 @@ if ($stmt = $pdo->prepare($sql)) {
     unset($stmt);
 }
 
-// Fetch recent logins
+// Fetch recent logins from login_logs
 $recentLogins = [];
-$sql = "SELECT u.username, u.user_type, l.login_time FROM login_logs l JOIN users u ON l.user_id = u.id ORDER BY l.login_time DESC LIMIT 10";
+$sql = "SELECT u.username, u.user_type, l.login_time 
+        FROM login_logs l 
+        JOIN users u ON l.user_id = u.id 
+        ORDER BY l.login_time DESC LIMIT 10";
 if ($stmt = $pdo->prepare($sql)) {
     if ($stmt->execute()) {
         $recentLogins = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    unset($stmt);
+}
+
+// Fetch login attempts from login_attempts based on IP address
+$loginAttempts = [];
+$sql = "SELECT * FROM login_attempts WHERE ip_address = :ip_address";
+if ($stmt = $pdo->prepare($sql)) {
+    // Bind the user's IP address to prevent SQL injection
+    $stmt->bindParam(':ip_address', $_SERVER['REMOTE_ADDR'], PDO::PARAM_STR);
+    if ($stmt->execute()) {
+        $loginAttempts = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     unset($stmt);
 }
@@ -94,31 +109,9 @@ if ($stmt = $pdo->prepare($sql)) {
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <!--
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Dropdown
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                    </li>
-                    -->
                 </ul>
                 <form class="d-flex" role="search">
-                    <a href="../logout.php" class="btn btn-danger">Logout</a>
+                    <a href="Logout.php" class="btn btn-danger">Logout</a>
                 </form>
             </div>
         </div>
@@ -127,31 +120,24 @@ if ($stmt = $pdo->prepare($sql)) {
     
     <!--Start Dashboard-->
     <div class="flex-container">
-        <!-- Card 1: Total Admin Users -->
         <div class="card text-bg-success mb-3">
             <div class="card-body">
                 <h5 class="card-title">Admin Users</h5>
                 <h1 id="totalAdmins"><?php echo $userStats['admin']; ?></h1>
             </div>
         </div>
-
-        <!-- Card 2: Total Users -->
         <div class="card text-bg-primary mb-3">
             <div class="card-body">
                 <h5 class="card-title">Users</h5>
                 <h1 id="totalUsers"><?php echo $userStats['user']; ?></h1>
             </div>
         </div>
-
-        <!-- Card 3: Temp Users -->
         <div class="card text-bg-danger text-white mb-3">
             <div class="card-body">
                 <h5 class="card-title">Temp Users</h5>
                 <h1 id="totalTempUsers"><?php echo $userStats['temp-user']; ?></h1>
             </div>
         </div>
-
-        <!-- Card 4: Total User Accounts -->
         <div class="card text-bg-warning text-white mb-3">
             <div class="card-body">
                 <h5 class="card-title">Total Users</h5>
@@ -181,35 +167,53 @@ if ($stmt = $pdo->prepare($sql)) {
             </tbody>
         </table>
 
-        <h3>Recent Logins</h3>
+        <h3>Recent Logins (from login_logs)</h3>
         <table class="table table-bordered" id="recentLoginsTable">
             <thead>
                 <tr>
                     <th>Username</th>
                     <th>Role</th>
                     <th>Login Timestamp</th>
-                    <th>Time Elapsed</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($recentLogins as $login): ?>
-                <tr data-login-time="<?php echo htmlspecialchars($login['login_time']); ?>">
+                <tr>
                     <td><?php echo htmlspecialchars($login['username']); ?></td>
                     <td><?php echo htmlspecialchars($login['user_type']); ?></td>
                     <td><?php echo date("Y-m-d H:i:s", strtotime($login['login_time'])); ?></td>
-                    <td class="time-elapsed"></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+
+        <h3>Login Attempts (from login_attempts)</h3>
+        <table class="table table-bordered" id="loginAttemptsTable">
+            <thead>
+                <tr>
+                    <th>IP Address</th>
+                    <th>Attempt Time</th>
+                    <th>Attempts</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($loginAttempts as $attempt): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($attempt['ip_address']); ?></td>
+                    <td><?php echo date("Y-m-d H:i:s", strtotime($attempt['attempt_time'])); ?></td>
+                    <td><?php echo $attempt['attempts']; ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+
         <button class="btn btn-primary" onclick="printToPDF()">Print to PDF</button>
     </div>
     <!--End Dashboard-->             
 
 <script>
     function printToPDF() {
-        // Select the entire content between Start and End Dashboard tags
-        const element = document.querySelector("body"); // Select everything in the body, including cards and tables
+        const element = document.querySelector("body"); 
         html2canvas(element).then((canvas) => {
             const imgData = canvas.toDataURL("image/png");
             const pdf = new jspdf.jsPDF("p", "mm", "a4");
@@ -217,41 +221,6 @@ if ($stmt = $pdo->prepare($sql)) {
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
             pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
             pdf.save("dashboard.pdf");
-        });
-    }
-
-    function timeElapsed(timestamp) {
-        const currentTime = Date.now() / 1000;
-        const timeDiff = currentTime - new Date(timestamp).getTime() / 1000;
-
-        const intervals = {
-            year: 31536000,
-            month: 2592000,
-            week: 604800,
-            day: 86400,
-            hour: 3600,
-            minute: 60,
-            second: 1
-        };
-
-        for (const [unit, seconds] of Object.entries(intervals)) {
-            const elapsed = timeDiff / seconds;
-            if (elapsed >= 1) {
-                const rounded = Math.floor(elapsed);
-                return `${rounded} ${unit}${rounded > 1 ? 's' : ''} ago`;
-            }
-        }
-
-        return 'Just now';
-    }
-
-    // Apply the time elapsed to the table rows
-    window.onload = function() {
-        const rows = document.querySelectorAll('#recentLoginsTable tbody tr');
-        rows.forEach(row => {
-            const loginTime = row.getAttribute('data-login-time');
-            const timeElapsedStr = timeElapsed(loginTime);
-            row.querySelector('.time-elapsed').textContent = timeElapsedStr;
         });
     }
 </script>
