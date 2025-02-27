@@ -92,7 +92,7 @@ function logFailedAttempt($ip_address) {
             $failed_attempts = $attempt ? $attempt['failed_attempts'] + 1 : 1;
 
             // Block IP after 5 failed attempts
-            $blocked_until = ($failed_attempts >= 5) ? date("Y-m-d H:i:s", strtotime("+15 minutes")) : null;
+            $blocked_until = ($failed_attempts >= 2) ? date("Y-m-d H:i:s", strtotime("+1 minutes")) : null;
 
             // Update or insert login attempt record
             $update_sql = "INSERT INTO login_attempts (ip_address, failed_attempts, last_failed_attempt, blocked_until)
