@@ -19,8 +19,11 @@ function getUserLoginLogs($pdo, $userId) {
         $stmt->bindParam(":user_id", $userId, PDO::PARAM_INT);
         if ($stmt->execute()) {
             $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            // Handle query execution failure
+            die("Error fetching login logs.");
         }
-        unset($stmt);
+        unset($stmt); // Clean up the statement
     }
     return $logs;
 }
@@ -33,8 +36,11 @@ function getFailedLoginAttempts($pdo, $ipAddress) {
         $stmt->bindParam(":ip_address", $ipAddress, PDO::PARAM_STR);
         if ($stmt->execute()) {
             $attempts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            // Handle query execution failure
+            die("Error fetching failed login attempts.");
         }
-        unset($stmt);
+        unset($stmt); // Clean up the statement
     }
     return $attempts;
 }

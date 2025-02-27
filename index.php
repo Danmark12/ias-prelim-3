@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["user_type"] = $user["user_type"];
                             $_SESSION["id"] = $user["id"];
 
-                            // Log successful login in `login_logs`
+                            // Log successful login in login_logs
                             $log_sql = "INSERT INTO login_logs (user_id, ip_address) VALUES (:user_id, :ip_address)";
                             if ($log_stmt = $pdo->prepare($log_sql)) {
                                 $log_stmt->bindParam(":user_id", $user["id"], PDO::PARAM_INT);
