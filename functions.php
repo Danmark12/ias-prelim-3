@@ -52,7 +52,7 @@ function trackFailedLoginAttempt($pdo, $ipAddress) {
             if ($attempts) {
                 // If there are failed attempts, increment and check block status
                 $failedAttempts = $attempts['failed_attempts'] + 1;
-                $blockedUntil = $failedAttempts >= 2 ? date("Y-m-d H:i:s", strtotime("+1 minutes")) : null;
+                $blockedUntil = $failedAttempts >= 5 ? date("Y-m-d H:i:s", strtotime("+15 minutes")) : null; // Block after 5 failed attempts
 
                 $updateSql = "UPDATE login_attempts SET failed_attempts = :failed_attempts, blocked_until = :blocked_until WHERE ip_address = :ip_address";
                 if ($updateStmt = $pdo->prepare($updateSql)) {

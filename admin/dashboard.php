@@ -31,6 +31,11 @@ function getFailedLoginAttempts($pdo, $ipAddress) {
         }
     }
 
+    // Ensure that it always returns an array, even if no data is found
+    if (!$attempts) {
+        return [];
+    }
+
     // Check if the user is blocked based on failed attempts and block duration
     foreach ($attempts as $attempt) {
         $blockedUntil = strtotime($attempt['blocked_until']);
@@ -131,31 +136,38 @@ $failedAttempts = getFailedLoginAttempts($pdo, $ipAddress);
         </table>
 
         <!-- Failed Login Attempts Section -->
-        <h3 class="my-3">Failed Login Attempts (IP: <?php echo htmlspecialchars($ipAddress); ?>)</h3>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Attempt Time</th>
-                    <th>IP Address</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (count($failedAttempts) > 0): ?>
+        <?php if (count($failedAttempts) > 0): ?>
+            <h3 class="my-3">Failed Login Attempts (IP: <?php echo htmlspecialchars($ipAddress); ?>)</h3>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Attempt Time</th>
+                        <th>IP Address</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
                     <?php foreach ($failedAttempts as $attempt): ?>
                     <tr>
                         <td><?php echo date("Y-m-d H:i:s", strtotime($attempt['last_failed_attempt'])); ?></td>
                         <td><?php echo htmlspecialchars($attempt['ip_address']); ?></td>
-                        <td><?php echo htmlspecialchars($attempt['failed_attempts'] > 0 ? 'Blocked' : 'Failed'); ?></td>
+                        <td>
+                            <?php 
+                                // Display status based on failed attempts
+                                if ($attempt['failed_attempts'] >= 5) {
+                                    echo "Blocked";
+                                } else {
+                                    echo "Failed";
+                                }
+                            ?>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="3">No failed login attempts found.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p>No failed login attempts found.</p>
+        <?php endif; ?>
 
         <!-- Logout Button -->
         <p>
